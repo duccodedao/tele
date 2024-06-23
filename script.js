@@ -36,7 +36,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 
 
-   // Hàm lấy dữ liệu từ Binance API
+// Biến để lưu trữ dữ liệu tiền điện tử
+let cryptoData = [];
+
+// Hàm lấy dữ liệu từ Binance API
 function fetchCryptoData() {
     var url = 'https://api.binance.com/api/v3/ticker/price';
 
@@ -46,6 +49,10 @@ function fetchCryptoData() {
                 throw new Error('Network response was not ok');
             }
             return response.json();
+        })
+        .then(data => {
+            cryptoData = data; // Lưu dữ liệu vào biến toàn cục
+            return data;
         })
         .catch(error => {
             console.error('Đã xảy ra lỗi:', error);
@@ -91,6 +98,16 @@ function displayLastUpdatedTime() {
     var updateTime = hours + ':' + (minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds : seconds) + ' ' + day + '/' + month + '/' + year;
     lastUpdatedElement.textContent = 'Dữ liệu được cập nhật lúc: ' + updateTime;
 }
+
+// Hàm tìm kiếm và lọc dữ liệu tiền điện tử
+function searchCrypto() {
+    const query = document.getElementById('searchBar').value.toLowerCase();
+    const filteredData = cryptoData.filter(coin => coin.symbol.toLowerCase().includes(query));
+    displayCryptoData(filteredData);
+}
+
+// Lắng nghe sự kiện nhập liệu trên thanh tìm kiếm
+document.getElementById('searchBar').addEventListener('input', searchCrypto);
 
 // Cập nhật giá crypto khi trang web được load lại
 updateCryptoPrices();
