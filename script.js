@@ -39,9 +39,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
 // Biến để lưu trữ dữ liệu tiền điện tử
 let cryptoData = [];
 
-// Hàm lấy dữ liệu từ Binance API
+// Hàm lấy dữ liệu từ CoinGecko API
 function fetchCryptoData() {
-    var url = 'https://api.binance.com/api/v3/ticker/price';
+    var url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=300&page=1&sparkline=false';
 
     return fetch(url)
         .then(response => {
@@ -65,8 +65,8 @@ function displayCryptoData(data) {
     cryptoPricesElement.innerHTML = ''; // Xóa nội dung cũ trước khi thêm dữ liệu mới
 
     for (const coin of data) {
-        var cryptoSymbol = coin.symbol;
-        var cryptoPrice = parseFloat(coin.price).toFixed(2);
+        var cryptoSymbol = coin.symbol.toUpperCase();
+        var cryptoPrice = parseFloat(coin.current_price).toFixed(8);
         var listItem = document.createElement('li');
         listItem.classList.add('crypto-item');
         listItem.innerHTML = `<span class="crypto-symbol">${cryptoSymbol}</span>: <span class="crypto-price">$${cryptoPrice}</span>`;
