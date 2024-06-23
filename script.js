@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         // Cập nhật giá crypto khi trang web được load lại
         updateCryptoPrices();
         // Cập nhật giá crypto mỗi 5 phút
-        setInterval(updateCryptoPrices, 300000); // 300000 milliseconds = 5 minutes
+        setInterval(updateCryptoPrices, 5000); // 300000 milliseconds = 5 minutes
 
 
 
@@ -113,4 +113,4 @@ function displayLastUpdatedTime() {
 // Cập nhật giá crypto khi trang web được load lại
 updateCryptoPrices();
 // Cập nhật giá crypto mỗi 5 phút
-setInterval(updateCryptoPrices, 300000); // 300000 milliseconds = 5 minutes
+setInterval(updateCryptoPrices, 5000); // 300000 milliseconds = 5 minutes
