@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
         // Hàm lấy dữ liệu từ CoinGecko API
         function fetchCryptoData() {
-            var url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false';
+            var url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=1000&page=1&sparkline=false';
 
             return fetch(url)
                 .then(response => {
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         // Cập nhật giá crypto khi trang web được load lại
         updateCryptoPrices();
         // Cập nhật giá crypto mỗi 5 phút
-        setInterval(updateCryptoPrices, 5000); // 300000 milliseconds = 5 minutes
+        setInterval(updateCryptoPrices, 300000); // 300000 milliseconds = 5 minutes
 
 
 
@@ -113,4 +113,4 @@ function displayLastUpdatedTime() {
 // Cập nhật giá crypto khi trang web được load lại
 updateCryptoPrices();
 // Cập nhật giá crypto mỗi 5 phút
-setInterval(updateCryptoPrices, 5000); // 300000 milliseconds = 5 minutes
+setInterval(updateCryptoPrices, 300000); // 300000 milliseconds = 5 minutes
