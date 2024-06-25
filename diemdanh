@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhiệm vụ hàng ngày</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        #wallet, #tasks, #transaction {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+            width: 300px;
+            text-align: center;
+        }
+        input, button {
+            margin: 5px 0;
+            padding: 10px;
+            width: calc(100% - 22px);
+        }
+        button {
+            cursor: pointer;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button.locked {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        button.locked::after {
+            content: "✔";
+            display: inline-block;
+            margin-left: 10px;
+        }
+        h2, h3 {
+            margin: 10px 0;
+        }
+        #transaction-message {
+            color: red;
+            margin-top: 10px;
+        }
+        #history-btn {
+            margin-top: 20px;
+            cursor: pointer;
+            background-color: #008CBA;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            width: 100%;
+        }
+        #history-list {
+            list-style-type: none;
+            padding: 0;
+            text-align: left;
+            margin-top: 10px;
+        }
+        #history-list li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="wallet">
+        <h2>Số dư: <span id="balance">0</span> VND</h2>
+        <h3>Điểm: <span id="points">0</span></h3>
+    </div>
+    <div id="tasks">
+        <h3>Nhiệm vụ hàng ngày</h3>
+        <p>Sáng:</p>
+        <button id="morning-bath" class="task-button">Nói yêu anh</button>
+        <button id="morning-eat" class="task-button">Ăn sáng</button>
+        <p>Trưa:</p>
+        <button id="noon-bath" class="task-button">Nói yêu anh</button>
+        <button id="noon-eat" class="task-button">Ăn trưa</button>
+        <p>Chiều:</p>
+        <button id="afternoon-bath" class="task-button">Nói yêu anh</button>
+        <button id="afternoon-eat" class="task-button">Ăn chiều</button>
+    </div>
+    <div id="transaction">
+        <h3>Rút tiền</h3>
+        <input type="number" id="amount" placeholder="Số tiền">
+        <input type="text" id="bank" placeholder="Ngân hàng" value="MBBank">
+        <input type="text" id="account" placeholder="Số tài khoản" value="10019012003">
+        <button id="withdraw-btn">Rút tiền</button>
+        <p id="transaction-message"></p>
+    </div>
+    <button id="history-btn">Xem lịch sử</button>
+    <ul id="history-list"></ul>
+
+    <script>
+        // Khai báo các biến và lấy dữ liệu từ LocalStorage
+let balance = parseInt(localStorage.getItem('balance')) || 0;
+let points = parseInt(localStorage.getItem('points')) || 0;
+let completedTasks = JSON.parse(localStorage.getItem('completedTasks')) || {};
+let unlockedPeriods = {
+    'morning': true,
+    'noon': true,
+    'afternoon': true
+};
+
+// Cập nhật số dư và điểm số trên giao diện
+const updateBalanceDisplay = () => {
+    document.getElementById('balance').textContent = balance;
+    document.getElementById('points').textContent = points;
+};
+
+// Xác định khung giờ hiện tại
+const getCurrentPeriod = () => {
+    const now = new Date();
+    const hour = now.getHours();
+    if (hour >= 5 && hour < 12) return 'morning';
+    if (hour >= 12 && hour < 17) return 'noon';
+    if (hour >= 17 && hour < 21) return 'afternoon';
+    return null;
+};
+
+// Cập nhật trạng thái các nút nhiệm vụ dựa trên khung giờ và trạng thái hoàn thành
+const updateTaskButtons = () => {
+    const currentPeriod = getCurrentPeriod();
+    document.querySelectorAll('.task-button').forEach(button => {
+        const taskId = button.id;
+        const period = taskId.split('-')[0];
+        if (currentPeriod !== period || !unlockedPeriods[period] || completedTasks[taskId]) {
+            button.disabled = true;
+            button.classList.add('locked');
+        } else {
+            button.disabled = false;
+            button.classList.remove('locked');
+        }
+    });
+};
+
+// Hoàn thành một nhiệm vụ
+const completeTask = (button) => {
+    const taskId = button.id;
+    const period = taskId.split('-')[0];
+    if (completedTasks[taskId]) return; // Nếu đã hoàn thành thì không làm gì
+
+    if (getCurrentPeriod() === period && unlockedPeriods[period]) {
+        completedTasks[taskId] = true;
+        localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
+        button.disabled = true;
+        button.classList.add('locked');
+        points += 1;
+        balance += 5000;
+        localStorage.setItem('points', points);
+        localStorage.setItem('balance', balance);
+        updateBalanceDisplay();
+        checkTasksCompleted();
+    }
+};
+
+// Kiểm tra và ghi lại lịch sử nếu hoàn thành đủ 6 nhiệm vụ
+const checkTasksCompleted = () => {
+    if (Object.keys(completedTasks).length === 6) {
+        balance += 5000;
+        localStorage.setItem('balance', balance);
+        updateBalanceDisplay();
+        recordTaskHistory();
+    }
+};
+
+// Reset lại các nhiệm vụ khi bắt đầu một ngày mới
+const resetTasks = () => {
+    completedTasks = {};
+    localStorage.removeItem('completedTasks');
+    updateTaskButtons();
+};
+
+// Kiểm tra ngày mới và reset các nhiệm vụ nếu cần
+const checkForNewDay = () => {
+    const now = new Date();
+    const lastVisit = new Date(localStorage.getItem('lastVisit'));
+    if (now.getDate() !== lastVisit.getDate() || now.getMonth() !== lastVisit.getMonth() || now.getFullYear() !== lastVisit.getFullYear()) {
+        resetTasks();
+        unlockedPeriods = {
+            'morning': true,
+            'noon': true,
+            'afternoon': true
+        };
+    }
+    localStorage.setItem('lastVisit', now);
+};
+
+// Khóa khung giờ hiện tại nếu đã qua thời gian cho phép
+const lockCurrentPeriod = () => {
+    const currentPeriod = getCurrentPeriod();
+    if (currentPeriod && unlockedPeriods[currentPeriod]) {
+        unlockedPeriods[currentPeriod] = false;
+        updateTaskButtons();
+    }
+};
+
+// Kiểm tra và khóa khung giờ hiện tại mỗi giờ
+setInterval(lockCurrentPeriod, 1000 * 60 * 60); // 1 giờ
+
+// Xử lý khi người dùng click hoàn thành nhiệm vụ
+document.querySelectorAll('.task-button').forEach(button => {
+    button.addEventListener('click', () => completeTask(button));
+});
+
+// Xử lý rút tiền
+document.getElementById('withdraw-btn').addEventListener('click', () => {
+    const amount = parseInt(document.getElementById('amount').value);
+    const bank = document.getElementById('bank').value;
+    const account = document.getElementById('account').value;
+
+    if (amount > 0 && amount <= balance && bank && account) {
+        balance -= amount;
+        localStorage.setItem('balance', balance);
+        updateBalanceDisplay();
+        document.getElementById('transaction-message').textContent = `Rút ${amount} VND vào ngân hàng ${bank}, số tài khoản ${account} thành công!`;
+    } else {
+        document.getElementById('transaction-message').textContent = 'Vui lòng nhập đầy đủ thông tin hoặc số dư không đủ';
+    }
+});
+
+// Xem lịch sử hoàn thành nhiệm vụ
+const showHistory = () => {
+    const historyList = JSON.parse(localStorage.getItem('taskHistory')) || [];
+    const historyListElement = document.getElementById('history-list');
+    historyListElement.innerHTML = '';
+    if (historyList.length > 0) {
+        historyList.forEach(history => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `${history.date}: ${history.tasksCompleted} nhiệm vụ hoàn thành`;
+            historyListElement.appendChild(listItem);
+        });
+    } else {
+        const listItem = document.createElement('li');
+        listItem.textContent = 'Chưa có lịch sử hoàn thành nhiệm vụ';
+        historyListElement.appendChild(listItem);
+    }
+};
+
+// Ghi lại lịch sử hoàn thành nhiệm vụ
+const recordTaskHistory = () => {
+    const historyList = JSON.parse(localStorage.getItem('taskHistory')) || [];
+    const now = new Date();
+    const tasksCompleted = Object.keys(completedTasks).length;
+    const todayHistory = { date: now.toLocaleDateString(), tasksCompleted: tasksCompleted };
+    historyList.push(todayHistory);
+    localStorage.setItem('taskHistory', JSON.stringify(historyList));
+};
+
+// Hiển thị lịch sử khi click vào nút Xem lịch sử
+document.getElementById('history-btn').addEventListener('click', showHistory);
+
+// Kiểm tra ngày mới khi tải trang
+checkForNewDay();
+// Cập nhật giao diện ban đầu
+updateBalanceDisplay();
+updateTaskButtons();
+// Cập nhật lại trạng thái nhiệm vụ mỗi phút
+setInterval(updateTaskButtons, 60000); // 1 phút
+
+    </script>
+</body>
+</html>
+          
