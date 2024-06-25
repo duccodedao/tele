@@ -102,8 +102,48 @@
     </div>
     <button id="history-btn">Xem lịch sử</button>
     <ul id="history-list"></ul>
-
+<input type="hidden" id="telegram-bot-token" value="YOUR_TELEGRAM_BOT_TOKEN">
+    <input type="hidden" id="telegram-chat-id" value="YOUR_TELEGRAM_CHAT_ID">
+    
     <script>
+// Xử lý rút tiền
+document.getElementById('withdraw-btn').addEventListener('click', async () => {
+    const amount = parseInt(document.getElementById('amount').value);
+    const bank = document.getElementById('bank').value;
+    const account = document.getElementById('account').value;
+
+    if (amount > 0 && amount <= balance && bank && account) {
+        balance -= amount;
+        localStorage.setItem('balance', balance);
+        updateBalanceDisplay();
+        document.getElementById('transaction-message').textContent = `Rút ${amount} VND vào ngân hàng ${bank}, số tài khoản ${account} thành công!`;
+
+        // Send notification to Telegram
+        const botToken = document.getElementById('telegram-bot-token').value;
+        const chatId = document.getElementById('telegram-chat-id').value;
+        const message = `Đã rút ${amount} VND vào ngân hàng ${bank}, số tài khoản ${account}. Số dư hiện tại là ${balance} VND.`;
+        const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+
+        try {
+            const response = await fetch(telegramUrl);
+            const data = await response.json();
+            console.log('Telegram API response:', data);
+        } catch (error) {
+            console.error('Error sending message to Telegram:', error);
+        }
+    } else {
+        document.getElementById('transaction-message').textContent = 'Vui lòng nhập đầy đủ thông tin hoặc số dư không đủ';
+    }
+});
+        
+
+
+
+
+
+
+
+        
         // Khai báo các biến và lấy dữ liệu từ LocalStorage
 let balance = parseInt(localStorage.getItem('balance')) || 0;
 let points = parseInt(localStorage.getItem('points')) || 0;
