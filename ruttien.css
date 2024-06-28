@@ -1,0 +1,95 @@
+/* styles.css */
+
+/* Đặt kiểu chữ và căn lề chung */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #121212;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* Tiêu đề chính */
+h2 {
+    color: #f1f1f1;
+    margin: 20px 0;
+    font-weight: 300;
+    font-size: 24px;
+}
+
+/* Định dạng các nút đăng ký sàn giao dịch */
+.registration-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.ico-btn {
+    display: block;
+    width: 140px;
+    height: 140px;
+    background-color: #1e1e1e;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.ico-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.ico-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+}
+
+/* Định dạng phần các bước tham gia */
+.steps, .preparation {
+    max-width: 600px;
+    margin: 20px 20px;
+    padding: 20px;
+    background-color: #1e1e1e;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.steps h2, .preparation h2 {
+    font-weight: 400;
+    color: #f1f1f1;
+    margin-bottom: 15px;
+}
+
+.steps ol, .preparation ol {
+    padding-left: 20px;
+}
+
+.steps ol li, .preparation ol li {
+    margin-bottom: 10px;
+    line-height: 1.8;
+    color: #cccccc;
+}
+
+/* Định dạng cho phần đăng ký sàn cho người Việt */
+.preparation {
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.preparation h2 {
+    text-align: center;
+    font-weight: 300;
+    color: #f1f1f1;
+    margin-bottom: 15px;
+}
